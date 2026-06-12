@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Salesflow — Case Study · dokiart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:    oklch(96% 0.004 80);
+  --paper-2:  oklch(93% 0.006 80);
+  --ink:      oklch(15% 0.005 250);
+  --ink-2:    oklch(35% 0.006 250);
+  --ink-3:    oklch(55% 0.006 250);
+  --ink-4:    oklch(70% 0.006 250);
+  --black:    oklch(13% 0.004 250);
+  --rule:     oklch(15% 0.005 250 / 0.14);
+  --red:      oklch(58% 0.20 28);
+  --red-soft: oklch(58% 0.20 28 / 0.45);
+  --sans: 'Inter Tight', -apple-system, system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --pad: clamp(28px, 5vw, 80px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--red); color: var(--paper); }
+
+/* ─── left edge ─── */
+.edge {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 100%;
+  background: var(--red);
+  z-index: 10;
+}
+
+/* ─── bg rules ─── */
+.bg-rules {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  display: grid;
+  grid-template-columns:
+    var(--pad) 0.4fr
+    clamp(30px,5vw,80px) 1fr
+    clamp(30px,5vw,80px) 1fr
+    clamp(30px,5vw,80px) 1fr
+    var(--pad);
+}
+.bg-rules .r0,.bg-rules .r1,.bg-rules .r2,.bg-rules .r3 {
+  position: relative; border-left: 1px solid var(--rule); grid-row: 1;
+}
+.bg-rules .r0 { grid-column: 2; }
+.bg-rules .r1 { grid-column: 4; }
+.bg-rules .r2 { grid-column: 6; }
+.bg-rules .r3 { grid-column: 8; }
+
+header, main, footer { position: relative; z-index: 1; }
+
+/* ─── nav ─── */
+.nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 28px var(--pad);
+}
+.nav .logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--sans); font-weight: 700; font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.nav .logo .sq { width: 12px; height: 12px; background: var(--red); display: inline-block; }
+.nav-links { display: flex; gap: 36px; }
+.nav-links a {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3); transition: color .2s;
+}
+.nav-links a:hover { color: var(--red); }
+
+/* ─── case hero ─── */
+.case-hero {
+  padding: 80px var(--pad) 0;
+  border-bottom: 1px solid var(--rule);
+}
+.case-hero-meta {
+  display: flex; align-items: center; gap: 20px;
+  margin-bottom: 40px;
+}
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3); transition: color .2s;
+}
+.back-link:hover { color: var(--red); }
+.back-link .arr { transition: transform .2s; }
+.back-link:hover .arr { transform: translateX(-3px); }
+.meta-divider { width: 1px; height: 16px; background: var(--rule); }
+.case-num {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--red);
+}
+
+.case-hero-body {
+  display: grid;
+  grid-template-columns: 1fr 0.45fr;
+  gap: clamp(40px, 5vw, 100px);
+  align-items: end;
+  padding-bottom: 64px;
+}
+.case-title {
+  font-family: var(--sans); font-weight: 800;
+  font-size: clamp(52px, 8vw, 120px);
+  line-height: 0.88; letter-spacing: -0.05em;
+  color: var(--ink);
+}
+.case-title .red { color: var(--red); display: block; }
+
+.case-meta-block {
+  display: flex; flex-direction: column; gap: 24px;
+  padding-bottom: 8px;
+}
+.meta-row {
+  display: flex; flex-direction: column; gap: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+.meta-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-4);
+}
+.meta-value {
+  font-family: var(--sans); font-size: 14px;
+  font-weight: 500; color: var(--ink);
+}
+
+/* ─── hero image strip ─── */
+.hero-image {
+  width: 100%;
+  height: clamp(280px, 40vw, 560px);
+  background: var(--paper-2);
+  border-top: 1px solid var(--rule);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-image img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: top center;
+  display: block;
+}
+/* placeholder state when no image */
+.hero-image .img-placeholder {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ─── section shared ─── */
+.section {
+  padding: 80px var(--pad) 100px;
+  border-bottom: 1px solid var(--rule);
+}
+.section-inner {
+  display: grid;
+  grid-template-columns: 0.4fr 1fr;
+  gap: clamp(40px, 5vw, 100px);
+}
+.section-label {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-2); padding-top: 6px;
+}
+.section-label span { display: block; color: var(--red); margin-bottom: 4px; }
+
+/* ─── context section ─── */
+.context-body { display: flex; flex-direction: column; gap: 0; }
+.context-h {
+  font-family: var(--sans); font-weight: 700;
+  font-size: clamp(32px, 4vw, 56px);
+  letter-spacing: -0.035em; line-height: 0.95;
+  margin-bottom: 32px;
+}
+.context-h .red { color: var(--red); }
+.body-p {
+  font-size: 16px; line-height: 1.65;
+  color: var(--ink-2); margin-bottom: 16px;
+  max-width: 58ch;
+}
+.body-p:last-child { margin-bottom: 0; }
+.body-p strong { color: var(--ink); font-weight: 600; }
+
+.tags-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 32px;
+}
+.tag {
+  border: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 5px 14px; color: var(--ink-3);
+}
+
+/* ─── work areas ─── */
+.work-areas { display: flex; flex-direction: column; gap: 0; }
+
+.work-area {
+  padding: 48px 0;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 32px;
+}
+.work-area:last-child { border-bottom: 1px solid var(--rule); }
+.wa-num {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; color: var(--red);
+  text-transform: uppercase; padding-top: 6px;
+}
+.wa-body {}
+.wa-title {
+  font-family: var(--sans); font-weight: 700;
+  font-size: clamp(22px, 2.2vw, 30px);
+  letter-spacing: -0.022em; line-height: 1.15;
+  margin-bottom: 12px;
+}
+.wa-desc {
+  font-size: 15px; line-height: 1.6;
+  color: var(--ink-2); max-width: 56ch;
+  margin-bottom: 0;
+}
+
+/* ─── screenshot grid ─── */
+.shot-grid {
+  padding: 0 var(--pad) 100px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 2vw, 24px);
+}
+.shot-grid.three-col { grid-template-columns: repeat(3, 1fr); }
+.shot-grid.full-width { grid-template-columns: 1fr; }
+
+.shot {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.shot img {
+  width: 100%; display: block;
+  object-fit: cover;
+}
+.shot-caption {
+  padding: 12px 16px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-4); border-top: 1px solid var(--rule);
+}
+/* placeholder when no image */
+.shot-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ─── impact numbers ─── */
+.impact-nums {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 3vw, 48px);
+  margin-bottom: 56px;
+}
+.impact-num { display: flex; flex-direction: column; gap: 8px; }
+.impact-num .big {
+  font-family: var(--sans); font-weight: 700;
+  font-size: clamp(48px, 6vw, 96px);
+  line-height: 0.85; letter-spacing: -0.045em;
+  display: flex; align-items: baseline; gap: 4px;
+}
+.impact-num .big sup {
+  font-size: 0.3em; font-weight: 500;
+  color: var(--red); vertical-align: super;
+}
+.impact-num .big .unit {
+  font-size: 0.38em; font-weight: 500;
+  color: var(--red); letter-spacing: 0;
+}
+.impact-num .ilabel {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+.impact-num .idesc {
+  font-size: 14px; line-height: 1.5;
+  color: var(--ink-2); max-width: 24ch;
+}
+
+/* ─── reflection ─── */
+.reflection-body { display: flex; flex-direction: column; gap: 28px; }
+.reflection-item {
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.ri-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 8px;
+}
+.ri-text {
+  font-size: 16px; line-height: 1.65;
+  color: var(--ink-2); max-width: 58ch;
+}
+.ri-text strong { color: var(--ink); font-weight: 600; }
+
+/* ─── next case ─── */
+.next-case {
+  padding: 80px var(--pad) 80px;
+  display: grid;
+  grid-template-columns: 0.4fr 1fr;
+  gap: clamp(40px, 5vw, 100px);
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+}
+.next-label {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.next-link {
+  display: inline-flex; align-items: baseline;
+  gap: 20px;
+  font-family: var(--sans); font-weight: 700;
+  font-size: clamp(36px, 5vw, 64px);
+  letter-spacing: -0.035em; line-height: 0.95;
+  color: var(--ink); transition: color .25s;
+}
+.next-link .arr { font-size: 0.55em; color: var(--ink-3); transition: transform .25s, color .25s; }
+.next-link:hover { color: var(--red); }
+.next-link:hover .arr { color: var(--red); transform: translate(6px, -3px); }
+
+/* ─── footer ─── */
+.foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 32px var(--pad);
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3);
+}
+.foot .clock { display: inline-flex; align-items: center; gap: 10px; }
+.foot .clock .pulse {
+  width: 6px; height: 6px; background: var(--red);
+  border-radius: 50%; animation: blink 2s infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: .4; transform: scale(.85); }
+  50%      { opacity: 1;  transform: scale(1.1); }
+}
+.foot .links a { color: var(--ink-3); margin-left: 18px; transition: color .2s; }
+.foot .links a:hover { color: var(--red); }
+
+/* ─── responsive ─── */
+@media (max-width: 880px) {
+  .bg-rules { display: none; }
+  .case-hero-body { grid-template-columns: 1fr; }
+  .section-inner { grid-template-columns: 1fr; }
+  .next-case { grid-template-columns: 1fr; }
+  .shot-grid,
+  .shot-grid.three-col { grid-template-columns: 1fr; }
+  .impact-nums { grid-template-columns: 1fr 1fr; }
+  .work-area { grid-template-columns: 40px 1fr; }
+  .foot { flex-direction: column; gap: 14px; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div class="edge"></div>
+<div class="bg-rules">
+  <div class="r0"></div><div class="r1"></div>
+  <div class="r2"></div><div class="r3"></div>
+</div>
+
+<!-- ─── NAV ─── -->
+<header class="nav">
+  <a class="logo" href="index.html"><span class="sq"></span>dokiart</a>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="Work.html">Work</a>
+    <a href="About.html">About</a>
+    <a href="Play.html">Play</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ─── CASE HERO ─── -->
+  <section class="case-hero">
+    <div class="case-hero-meta">
+      <a class="back-link" href="Work.html"><span class="arr">←</span> All work</a>
+      <div class="meta-divider"></div>
+      <span class="case-num">/ 02</span>
+    </div>
+
+    <div class="case-hero-body">
+      <h1 class="case-title">
+        Sales<span class="red">flow</span>
+      </h1>
+      <div class="case-meta-block">
+        <div class="meta-row">
+          <span class="meta-label">Role</span>
+          <span class="meta-value">Sole Product Designer</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Company</span>
+          <span class="meta-value">Salesflow.io — B2B SaaS, UK</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Tenure</span>
+          <span class="meta-value">2020 — present · 5+ years</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Focus areas</span>
+          <span class="meta-value">Design Systems · Pricing UX · AI Workflow</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HERO IMAGE ─── -->
+  <div class="hero-image">
+    <!-- REPLACE: drop your best full-width screenshot here -->
+    <!-- <img src="img/salesflow-hero.png" alt="Salesflow product overview"> -->
+    <span class="img-placeholder">— hero screenshot · replace this —</span>
+  </div>
+
+  <!-- ─── CONTEXT ─── -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-label">
+        <span>/ 01</span>
+        — Context
+      </div>
+      <div class="context-body">
+        <h2 class="context-h">One designer. <span class="red">Five years.</span> A live product.</h2>
+        <p class="body-p">Salesflow is a B2B SaaS platform for automated LinkedIn outreach — used by sales teams, agencies, and enterprise clients. I joined in 2020 as the sole designer and have owned product design end-to-end ever since: no design manager, no design team, no handoff buffer.</p>
+        <p class="body-p">That means <strong>research, UX strategy, design systems, prototyping, and dev handoff</strong> — all sitting with one person. It also means being embedded across PM, BA, engineering, QA, support, and marketing simultaneously, and making every call without a second designer to pressure-test ideas.</p>
+        <p class="body-p">The product is still growing. So is the design practice inside it.</p>
+        <div class="tags-row">
+          <span class="tag">B2B SaaS</span>
+          <span class="tag">LinkedIn Automation</span>
+          <span class="tag">UK Remote</span>
+          <span class="tag">Design Systems</span>
+          <span class="tag">Pricing UX</span>
+          <span class="tag">AI Workflow</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── THE WORK ─── -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-label">
+        <span>/ 02</span>
+        — The Work
+      </div>
+      <div class="work-areas">
+
+        <div class="work-area">
+          <div class="wa-num">/ 01</div>
+          <div class="wa-body">
+            <h3 class="wa-title">Design System — token architecture from scratch</h3>
+            <p class="wa-desc">Built Salesflow's first scalable design system, then led its full rebuild with semantic token architecture using Figma Variables — color, spacing, and typography scales. Championed it to the dev team and CEO: engineering set up Storybook and started the Figma-to-Storybook pipeline. A process story, not just a delivery story.</p>
+          </div>
+        </div>
+
+        <div class="work-area">
+          <div class="wa-num">/ 02</div>
+          <div class="wa-body">
+            <h3 class="wa-title">Core product flows — campaign builder, inbox, analytics</h3>
+            <p class="wa-desc">Redesigned and iterated the platform's most critical surfaces: multi-step campaign automation builder, inbox at scale, data-heavy dashboards, and reporting modules. Focus throughout: simplify complex automation logic, clarify multi-stage flows, and improve structure where data density creates decision paralysis.</p>
+          </div>
+        </div>
+
+        <div class="work-area">
+          <div class="wa-num">/ 03</div>
+          <div class="wa-body">
+            <h3 class="wa-title">Pricing & billing UX — a revenue-critical surface</h3>
+            <p class="wa-desc">Stepped in proactively when the team was struggling with the pricing page redesign. Identified requirement gaps before design work started. Scope: full pricing page with seat-based calculator logic, in-app upgrade and downgrade flows, plan comparison UX, and proration edge cases. High cross-functional coordination — product, engineering, finance logic all in the room.</p>
+          </div>
+        </div>
+
+        <div class="work-area">
+          <div class="wa-num">/ 04</div>
+          <div class="wa-body">
+            <h3 class="wa-title">AI-assisted workflow — introduced it to the whole team</h3>
+            <p class="wa-desc">The team was using AI individually, in silos. I introduced a shared pipeline: tokenized Figma files connected to a Figma MCP server, using Claude to generate and iterate HTML/CSS prototypes from design context — pushing and pulling between design and code. Presented this to the CEO as a systemic initiative, not a personal shortcut. Next step: connect MCP to Mixpanel for data-informed design decisions.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SCREENSHOTS — set 1: design system ─── -->
+  <div class="shot-grid">
+    <!-- REPLACE: design system / token screenshots -->
+    <div class="shot">
+      <div class="shot-placeholder">screenshot — design system tokens</div>
+      <div class="shot-caption">Token architecture — color scales</div>
+    </div>
+    <div class="shot">
+      <div class="shot-placeholder">screenshot — component library</div>
+      <div class="shot-caption">Component library — button states</div>
+    </div>
+  </div>
+
+  <!-- ─── SCREENSHOTS — set 2: product flows ─── -->
+  <div class="shot-grid three-col" style="padding-top: 0;">
+    <!-- REPLACE: product flow screenshots -->
+    <div class="shot">
+      <div class="shot-placeholder">screenshot — campaign builder</div>
+      <div class="shot-caption">Campaign builder — step 2</div>
+    </div>
+    <div class="shot">
+      <div class="shot-placeholder">screenshot — inbox</div>
+      <div class="shot-caption">Inbox — conversation view</div>
+    </div>
+    <div class="shot">
+      <div class="shot-placeholder">screenshot — dashboard</div>
+      <div class="shot-caption">Analytics dashboard</div>
+    </div>
+  </div>
+
+  <!-- ─── SCREENSHOTS — set 3: pricing (full width) ─── -->
+  <div class="shot-grid full-width" style="padding-top: 0;">
+    <!-- REPLACE: pricing page screenshot -->
+    <div class="shot">
+      <div class="shot-placeholder" style="aspect-ratio: 21/9;">screenshot — pricing page</div>
+      <div class="shot-caption">Pricing page — seat-based calculator</div>
+    </div>
+  </div>
+
+  <!-- ─── IMPACT ─── -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-label">
+        <span>/ 03</span>
+        — Impact
+      </div>
+      <div>
+        <div class="impact-nums">
+          <div class="impact-num">
+            <div class="big">30<span class="unit">→42%</span></div>
+            <div class="ilabel">Connection rate</div>
+            <div class="idesc">LinkedIn connection rate after onboarding flow and gamification redesign</div>
+          </div>
+          <div class="impact-num">
+            <div class="big">5<sup>+</sup></div>
+            <div class="ilabel">Years, sole designer</div>
+            <div class="idesc">Product scaled continuously with one designer in the seat throughout</div>
+          </div>
+          <div class="impact-num">
+            <div class="big">0<span class="unit">→1</span></div>
+            <div class="ilabel">Design system</div>
+            <div class="idesc">From no system to token architecture with active Storybook integration in progress</div>
+          </div>
+        </div>
+        <p class="body-p">Faster and more predictable delivery cycles after the design system. Fewer front-end inconsistencies reaching production. The AI pipeline reduced concept and exploration time significantly — now being adopted by the wider team.</p>
+        <p class="body-p" style="margin-top: 16px;">The pricing redesign is ongoing — outcome metrics not yet published.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── REFLECTION ─── -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-label">
+        <span>/ 04</span>
+        — Reflection
+      </div>
+      <div class="reflection-body">
+        <div class="reflection-item">
+          <div class="ri-label">What was hardest</div>
+          <p class="ri-text">Being the only designer means <strong>no one to push back on your assumptions</strong>. I learned to build that pressure from outside — involving engineers earlier, running ideas past support and sales before prototyping, using analytics as a second opinion. The discipline of designing without a design team is different from designing inside one.</p>
+        </div>
+        <div class="reflection-item">
+          <div class="ri-label">What changed my approach</div>
+          <p class="ri-text">The AI pipeline shifted how I think about the concept phase. When iteration is cheap, <strong>the bottleneck moves upstream</strong> — to the judgment call that decides which direction to iterate. That's made me sharper about articulating why before generating what.</p>
+        </div>
+        <div class="reflection-item">
+          <div class="ri-label">What I'd do differently</div>
+          <p class="ri-text">I would have pushed for a shared design system earlier — and framed it as an engineering speed story, not a design quality story. The pitch that worked for Storybook integration was about dev velocity, not visual consistency. <strong>Understanding what the other team needs to hear</strong> is its own design problem.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── NEXT CASE ─── -->
+  <section class="next-case">
+    <span class="next-label">— Next case</span>
+    <a class="next-link" href="clubberspot-case.html">
+      Clubberspot <span class="arr">↗</span>
+    </a>
+  </section>
+
+</main>
+
+<!-- ─── FOOTER ─── -->
+<footer class="foot">
+  <span>© 2026 Nina Prisniak / dokiart</span>
+  <span class="clock">
+    <span class="pulse"></span>
+    Kyiv — <span data-clock>—</span>
+  </span>
+  <span class="links">
+    <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+    <a href="mailto:nina&#64;dokiart.com">Email</a>
+  </span>
+</footer>
+
+<script>
+function tick() {
+  const fmt = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Kyiv',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(new Date());
+  document.querySelectorAll('[data-clock]').forEach(el => el.textContent = fmt);
+}
+tick(); setInterval(tick, 15000);
+</script>
+
+</body>
+</html>
