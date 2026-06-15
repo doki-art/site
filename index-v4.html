@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>dokiart — Nina Prisniak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500&family=Archivo:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --white:  #ffffff;
+  --ink:    #0a0b0d;
+  --ink-2:  #383b3e;
+  --ink-3:  #6f7275;
+  --ink-4:  #9fa2a5;
+  --rule:   rgba(10,11,13,0.14);
+  --red:    #d7352d;
+
+  --sans:    'Inter Tight', -apple-system, system-ui, sans-serif;
+  --archivo: 'Archivo', sans-serif;
+  --mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  --pad: clamp(28px, 5vw, 71px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--red); color: var(--white); }
+
+main, header, footer { position: relative; z-index: 2; }
+
+/* ─── fixed left red bar ─── */
+.edge {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 100%;
+  background: var(--red);
+  z-index: 200;
+}
+
+/* ─── background column rules ─── */
+.bg-rules {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  display: grid;
+  grid-template-columns:
+    var(--pad)
+    0.4fr clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr
+    var(--pad);
+}
+.bg-rules .r { position: relative; border-left: 1px solid var(--rule); grid-row: 1; }
+.bg-rules .r0 { grid-column: 2; }
+.bg-rules .r1 { grid-column: 4; }
+.bg-rules .r2 { grid-column: 6; }
+.bg-rules .r3 { grid-column: 8; }
+
+
+
+/* ─── nav ─── */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px var(--pad);
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.logo .sq { width: 12px; height: 12px; background: var(--red); flex-shrink: 0; }
+.nav-links { display: flex; gap: 48px; }
+.nav-links a {
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: color .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-links a:hover { color: var(--red); }
+.nav-links a.active { color: var(--red); }
+.nav-links a.active::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ─── hero ─── */
+.hero {
+  position: relative;
+  padding: 40px var(--pad) 56px;
+  min-height: calc(100svh - 80px); /* 80px ≈ nav height, so nav + hero = one screen */
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.hero-left {
+  position: relative;
+  z-index: 2;
+  max-width: 55%;
+}
+.hero-display {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(72px, 14vw, 198px);
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  margin-left: -0.04em;
+}
+.hero-display .red { color: var(--red); display: block; }
+.hero-tag {
+  margin-top: 32px;
+  font-family: var(--archivo);
+  font-size: 14px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+.hero-tag::before {
+  content: '';
+  width: 32px; height: 1px;
+  background: var(--red);
+  flex-shrink: 0;
+}
+
+/* ─── full-page pulse canvas ─── */
+#pulse-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ─── custom cursor ─── */
+@media (hover: hover) and (pointer: fine) {
+  * { cursor: none !important; }
+  #cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 7px; height: 7px;
+    margin: -3.5px 0 0 -3.5px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 1.5px solid var(--red);
+    pointer-events: none;
+    z-index: 300;
+    transition: width .22s ease, height .22s ease, margin .22s ease, background .22s ease, opacity .2s ease;
+  }
+  #cursor.is-hover {
+    width: 38px; height: 38px;
+    margin: -19px 0 0 -19px;
+    background: transparent;
+  }
+}
+
+/* ─── intro ─── */
+/* No label col — body text sits in the right 2/3 matching Figma */
+.intro {
+  padding: 40px var(--pad) 100px;
+  display: grid;
+  grid-template-columns:
+    0.4fr clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr;
+  align-items: start;
+}
+/* left col is empty — body starts at the col-2 rule line */
+.intro .spacer { grid-column: 1 / 3; }
+.intro .body {
+  grid-column: 5 / -1;
+}
+.intro .body p {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink);
+  max-width: 44ch;
+  margin-bottom: 12px;
+}
+.intro .body p.accent { color: var(--red); margin-bottom: 0; }
+
+/* ─── numbers ─── */
+.numbers {
+  padding: 60px var(--pad) 120px;
+  display: grid;
+  grid-template-columns: 0.4fr repeat(3, 1fr);
+  gap: clamp(30px, 5vw, 80px);
+  align-items: start;
+}
+.numbers .heading {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(28px, 3.5vw, 48px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  align-self: center;
+}
+.numbers .heading .red { color: var(--red); }
+.num { display: flex; flex-direction: column; gap: 20px; }
+.num .lab {
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.num .big {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(80px, 9vw, 128px);
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  display: flex;
+  align-items: baseline;
+}
+.num .big sup {
+  font-size: 0.32em;
+  font-weight: 800;
+  color: var(--red);
+  margin-left: 2px;
+  vertical-align: super;
+}
+.num .desc {
+  font-size: 14px;
+  color: var(--ink-2);
+  max-width: 22ch;
+  line-height: 1.5;
+  transition: color .2s;
+}
+.stat-hover { cursor: default; }
+.num .desc.is-hover {
+  font-family: var(--sans);
+  font-style: italic;
+  color: var(--red);
+}
+
+/* ─── selected cases ─── */
+.cases {
+  padding: 40px var(--pad) 100px;
+}
+.cases-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 48px;
+}
+.cases-head-left { display: flex; align-items: baseline; gap: 24px; }
+.cases-head h2 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(28px, 3.5vw, 48px);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+}
+.cases-head h2 .red { color: var(--red); }
+.pw-note {
+  font-size: 17px;
+  color: var(--ink);
+}
+.cases-more {
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color .2s;
+}
+.cases-more:hover { color: var(--red); }
+
+.case-list { display: flex; flex-direction: column; }
+.case-row {
+  display: grid;
+  grid-template-columns:
+    0.4fr clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr;
+  align-items: center;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+}
+.case-row:first-child { border-top: 1px solid var(--rule); }
+/* let the wrapper's children participate in the row grid directly */
+.case-left { display: contents; }
+.case-thumb {
+  grid-column: 3 / 4;   /* starts on r1 (second rule) */
+  justify-self: start;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 8 / 5;
+  height: auto;
+  background: #f0eeec;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.case-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.case-body {
+  grid-column: 5 / 7;   /* starts on r2 (third rule), bounded by r3 — no cut */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.case-title {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(18px, 1.8vw, 26px);
+  letter-spacing: 0.005em;
+  line-height: 1.12;
+  color: var(--ink);
+  transition: color .2s;
+}
+.case-row:hover .case-title { color: var(--red); }
+.case-sub {
+  font-size: 17px;
+  color: var(--ink-2);
+  letter-spacing: -0.005em;
+}
+.case-tag {
+  grid-column: 7 / 8;   /* starts on r3, right-aligned to the page edge */
+  justify-self: end;
+  font-family: var(--archivo);
+  font-size: 14px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* ─── approach ─── */
+.method {
+  padding: 80px var(--pad) 120px;
+  display: grid;
+  grid-template-columns: 0.4fr 1fr;
+  gap: clamp(40px, 5vw, 100px);
+  align-items: start;
+}
+.method-head .lab {
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: block;
+  margin-bottom: 0;
+}
+.method-head h2 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(28px, 3.5vw, 48px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+.method-head h2 .red { color: var(--red); }
+.principles { display: flex; flex-direction: column; gap: 64px; }
+.principle h3 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(20px, 2vw, 30px);
+  letter-spacing: -0.048em;
+  line-height: 1.15;
+  margin-bottom: 12px;
+  max-width: 36ch;
+}
+.principle p {
+  font-size: 17px;
+  color: var(--ink-2);
+  line-height: 1.55;
+  max-width: 56ch;
+  letter-spacing: -0.005em;
+}
+
+/* ─── cta ─── */
+.cta {
+  padding: 100px var(--pad) 120px;
+  display: grid;
+  grid-template-columns: 0.4fr 1fr;
+  gap: clamp(40px, 5vw, 100px);
+  align-items: end;
+}
+.cta .lab {
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.cta h2 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(40px, 5.8vw, 85px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-bottom: 40px;
+}
+.cta h2 .red { color: var(--red); }
+.cta-mail {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 26px;
+  border: 1px solid var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--white);
+  transition: background .25s, color .25s;
+}
+.cta-mail:hover { background: var(--ink); color: var(--white); }
+
+/* ─── footer ─── */
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px var(--pad);
+  border-top: 1px solid var(--rule);
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.foot .clock { display: inline-flex; align-items: center; gap: 10px; }
+.foot .clock .pulse {
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: .4; transform: scale(.85); }
+  50%      { opacity: 1;  transform: scale(1.1); }
+}
+.foot .links a { color: var(--ink-3); margin-left: 18px; transition: color .2s; }
+.foot .links a:hover { color: var(--red); }
+
+/* ─── responsive ─── */
+@media (max-width: 880px) {
+  .bg-rules { display: none; }
+  .hero-left { max-width: 100%; }
+
+  .intro { grid-template-columns: 1fr; }
+  .intro .spacer { display: none; }
+  .numbers { grid-template-columns: 1fr 1fr; }
+  .numbers .heading { grid-column: 1 / -1; }
+  .method, .cta { grid-template-columns: 1fr; }
+  .case-row { grid-template-columns: 1fr; gap: 16px; align-items: start; }
+  .case-thumb { grid-column: 1; width: 100%; max-width: 320px; aspect-ratio: 8 / 5; }
+  .case-body { grid-column: 1; }
+  .case-tag { grid-column: 1; }
+  .foot { flex-direction: column; gap: 14px; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="pulse-canvas"></canvas>
+<div id="cursor"></div>
+<div class="edge"></div>
+<div class="bg-rules">
+  <div class="r r0"></div><div class="r r1"></div><div class="r r2"></div><div class="r r3"></div>
+</div>
+
+<header class="nav">
+  <a class="logo" href="#"><span class="sq"></span>dokiart</a>
+  <nav class="nav-links">
+    <a href="#" class="active">Home</a>
+    <a href="Work.html">Work</a>
+    <a href="About.html">About</a>
+    <a href="Play.html">Play</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- hero -->
+  <section class="hero">
+    <div class="hero-left">
+      <h1 class="hero-display">
+        Product
+        <span class="red">Designer</span>
+      </h1>
+      <div class="hero-tag">13+ yrs · Complex B2B · EMEA remote</div>
+    </div>
+  </section>
+
+  <!-- intro — no label, body starts in right column -->
+  <section class="intro">
+    <div class="spacer"></div>
+    <div class="body">
+      <p>Hi, I'm Nina, Product Designer with 13+ years designing for expert users in complex B2B environments — data-heavy interfaces, multi-role systems, products where clarity isn't optional.</p>
+      <p class="accent">The harder the product, the more I want it.</p>
+    </div>
+  </section>
+
+  <!-- numbers -->
+  <section class="numbers">
+    <h2 class="heading">By the <span class="red">numbers</span></h2>
+
+    <div class="num stat-hover">
+      <div class="lab">Years / 01</div>
+      <div class="big">13<sup>+</sup></div>
+      <p class="desc" data-default="Years designing the unsexy, complex stuff." data-hover="sometimes sexy too.">Years designing the unsexy, complex stuff.</p>
+    </div>
+
+    <div class="num stat-hover">
+      <div class="lab">Team / 02</div>
+      <div class="big">15<sup>+</sup></div>
+      <p class="desc" data-default="People at the agency I co-founded." data-hover="hiring the right people is a skill, not luck.">People at the agency I co-founded.</p>
+    </div>
+
+    <div class="num stat-hover">
+      <div class="lab">Solo / 03</div>
+      <div class="big">5<sup>+</sup></div>
+      <p class="desc" data-default="Years as the only designer on a live product." data-hover="the product is still alive and growing. so am I.">Years as the only designer on a live product.</p>
+    </div>
+  </section>
+
+  <!-- selected cases -->
+  <section class="cases">
+    <div class="cases-head">
+      <div class="cases-head-left">
+        <h2>Selected <span class="red">Cases</span></h2>
+        <span class="pw-note">Password required</span>
+      </div>
+      <a class="cases-more" href="Work.html">more ↗</a>
+    </div>
+
+    <div class="case-list">
+
+      <div class="case-row">
+        <div class="case-left">
+          <div class="case-thumb">
+            <img src="https://www.figma.com/api/mcp/asset/78eca9b3-2a81-43fc-8a62-9f1f11eaa0b2" alt="Salesflow case" />
+          </div>
+          <div class="case-body">
+            <div class="case-title">Making multi-step automation legible</div>
+            <div class="case-sub">Salesflow, Campaign Builder</div>
+          </div>
+        </div>
+        <div class="case-tag">Martech, B2B, SaaS</div>
+      </div>
+
+      <div class="case-row">
+        <div class="case-left">
+          <div class="case-thumb">
+            <img src="https://www.figma.com/api/mcp/asset/78eca9b3-2a81-43fc-8a62-9f1f11eaa0b2" alt="Leitwerk case" />
+          </div>
+          <div class="case-body">
+            <div class="case-title">Making risk legible for the people who carry it</div>
+            <div class="case-sub">Leitwerk, Credit Risk Workbench</div>
+          </div>
+        </div>
+        <div class="case-tag">Fintech, B2B, SaaS</div>
+      </div>
+
+      <div class="case-row">
+        <div class="case-left">
+          <div class="case-thumb">
+            <img src="https://www.figma.com/api/mcp/asset/78eca9b3-2a81-43fc-8a62-9f1f11eaa0b2" alt="Floston case" />
+          </div>
+          <div class="case-body">
+            <div class="case-title">From abstract idea to a product that shipped and found clients</div>
+            <div class="case-sub">Floston, Fleet Management</div>
+          </div>
+        </div>
+        <div class="case-tag">Automotive, B2B, SaaS</div>
+      </div>
+
+      <div class="case-row">
+        <div class="case-left">
+          <div class="case-thumb">
+            <img src="https://www.figma.com/api/mcp/asset/78eca9b3-2a81-43fc-8a62-9f1f11eaa0b2" alt="Healthcare case" />
+          </div>
+          <div class="case-body">
+            <div class="case-title">Redesign ..... SaaS Enterprise product</div>
+            <div class="case-sub">Lab</div>
+          </div>
+        </div>
+        <div class="case-tag">Healthcare, B2B, SaaS</div>
+      </div>
+
+      <div class="case-row">
+        <div class="case-left">
+          <div class="case-thumb">
+            <img src="https://www.figma.com/api/mcp/asset/78eca9b3-2a81-43fc-8a62-9f1f11eaa0b2" alt="Clubberspot case" />
+          </div>
+          <div class="case-body">
+            <div class="case-title">Building a brand and a SaaS product from a rough idea</div>
+            <div class="case-sub">Clubberspot</div>
+          </div>
+        </div>
+        <div class="case-tag">Entertainment, B2B + B2C</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- approach -->
+  <section class="method">
+    <div class="method-head">
+      <h2>My <span class="red">approach</span></h2>
+    </div>
+    <div class="principles">
+      <article class="principle">
+        <h3>Anyone with AI can generate fifty options. I know which one ships.</h3>
+        <p>Generation got cheap. Judgment didn't. Thirteen years of complex B2B is what filters the fifty down to one.</p>
+      </article>
+      <article class="principle">
+        <h3>A stuck problem usually just means the wrong room.</h3>
+        <p>The hardest work isn't features that exist — it's the ones with no precedent. I bring product, engineering, and real users to the table, and we solve it there.</p>
+      </article>
+      <article class="principle">
+        <h3>From discovery to handoff</h3>
+        <p>But the process always bends to the problem, it isn't a fixed set of steps. I move fast where speed is cheap and slow down where judgment isn't.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- cta -->
+  <section class="cta">
+    <span class="lab">— Contact</span>
+    <div>
+      <h2>If you've read this far, you probably have a <span class="red">problem worth solving.</span></h2>
+      <a href="mailto:nina&#64;dokiart.com" class="cta-mail">
+        nina&#64;dokiart.com <span>↗</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>© 2026 Nina Prisniak / dokiart</span>
+  <span class="clock">
+    <span class="pulse"></span>
+    Ukraine, Kyiv — <span data-clock>—</span>
+  </span>
+  <span class="links">
+    <a href="https://www.linkedin.com/in/nina-prisniak" target="_blank">LinkedIn</a>
+    <a href="https://www.behance.net/dokiart" target="_blank">Behance</a>
+  </span>
+</footer>
+
+<script>
+// ── Kyiv clock ──
+function tick() {
+  const t = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Kyiv', hour: '2-digit', minute: '2-digit', hour12: false
+  }).format(new Date());
+  document.querySelectorAll('[data-clock]').forEach(el => el.textContent = t);
+}
+tick(); setInterval(tick, 15000);
+
+// ── stat hover easter eggs ──
+document.querySelectorAll('.stat-hover').forEach(stat => {
+  const desc = stat.querySelector('.desc');
+  stat.addEventListener('mouseenter', () => {
+    desc.textContent = desc.dataset.hover;
+    desc.classList.add('is-hover');
+  });
+  stat.addEventListener('mouseleave', () => {
+    desc.textContent = desc.dataset.default;
+    desc.classList.remove('is-hover');
+  });
+});
+
+// ── custom cursor ──
+(function () {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const cursor = document.getElementById('cursor');
+  let visible = false;
+
+  window.addEventListener('pointermove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    if (!visible) { cursor.style.opacity = '1'; visible = true; }
+    // grow into a ring over interactive elements
+    const interactive = e.target.closest('a, button, input, textarea, select, .case-row, .stat-hover');
+    cursor.classList.toggle('is-hover', !!interactive);
+  });
+
+  document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; visible = false; });
+  document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; visible = true; });
+})();
+
+// ─────────────────────────────────────────────
+//  PULSE GRID — full-page background
+//  Adapted from field-backgrounds.js PulseGrid.
+//  Dots swell toward the cursor and ripple on
+//  click. Heartbeat drives ambient pulse.
+// ─────────────────────────────────────────────
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  // ── Config matching the site palette ──
+  const INK_RGB  = [10, 11, 13];   // --ink
+  const ACC_RGB  = [215, 53, 45];  // --red
+  const inkA  = a => `rgba(${INK_RGB},${a})`;
+  const accA  = a => `rgba(${ACC_RGB},${a})`;
+  const DOKI = {
+    paper: '#ffffff',
+    inkA,
+    accentA: accA,
+    weight:  0.55,   // dot size multiplier — bigger
+    density: 1.0,
+    bpm:     28,
+  };
+
+  // ── Canvas setup ──
+  const canvas = document.getElementById('pulse-canvas');
+  const ctx    = canvas.getContext('2d');
+  let w = 0, h = 0, dpr = 1;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── Mouse / pointer ──
+  const M = { x: w / 2, y: h / 2, sx: w / 2, sy: h / 2 };
+  window.addEventListener('pointermove', e => { M.x = e.clientX; M.y = e.clientY; });
+
+  // ── Click ripples ──
+  const clicks = [];
+  window.addEventListener('pointerdown', e => {
+    // ignore clicks on interactive elements
+    if (e.target.closest('a, button, input, textarea, select')) return;
+    clicks.push({ x: e.clientX, y: e.clientY, t: State.t });
+  });
+
+  // ── Heartbeat ──
+  function heartbeat(t) {
+    const period = 60 / DOKI.bpm;
+    const x = (t % period) / period;
+    const lub = Math.exp(-Math.pow((x - 0.05) / 0.045, 2));
+    const dub = 0.55 * Math.exp(-Math.pow((x - 0.20) / 0.05, 2));
+    return Math.min(1, lub + dub);
+  }
+
+  // ── State ──
+  const State = { ctx, w, h, t: 0, dt: 0, beat: 0, mouse: M, clicks };
+
+  // ── PulseGrid frame (verbatim logic from field-backgrounds.js) ──
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+  function frame(now) {
+    requestAnimationFrame(frame);
+
+    const dt = Math.min((now - (State._last || now)) / 1000, 0.05);
+    State._last = now;
+    State.t += dt;
+    State.dt = dt;
+    State.w = w; State.h = h;
+
+    // smooth mouse — low factor = more lag
+    M.sx += (M.x - M.sx) * 0.05;
+    M.sy += (M.y - M.sy) * 0.05;
+
+    // prune old clicks (>2.5s)
+    while (clicks.length && State.t - clicks[0].t > 2.5) clicks.shift();
+
+    // beat
+    let beat = heartbeat(State.t) * 0.7;
+    for (const c of clicks) {
+      const age = State.t - c.t;
+      beat += 0.95 * Math.exp(-Math.pow((age - 0.06) / 0.075, 2));
+    }
+    State.beat = beat;
+
+    // ── draw ──
+    const P = DOKI;
+    ctx.fillStyle = P.paper;
+    ctx.fillRect(0, 0, w, h);
+
+    const gap = 32 * (P.density || 1);
+    const r0  = 1.15;
+    const W   = P.weight || 1;
+    const mx  = M.sx, my = M.sy;
+    const ox  = ((w % gap) / 2) + gap / 2;
+    const oy  = ((h % gap) / 2) + gap / 2;
+
+    for (let y = oy; y < h; y += gap) {
+      for (let x = ox; x < w; x += gap) {
+        const dx = x - mx, dy = y - my;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+
+        // Static baseline — constant everywhere, no time-based motion.
+        // The field is quiet texture; nothing animates on its own.
+        let swell = 0.30;
+
+        // Cursor carves a smooth local clearing — the only ambient interaction.
+        const suppress = Math.exp(-d * d / (180 * 180));
+        swell *= (1 - suppress * 0.92);
+
+        // click shockwaves — user-initiated motion only
+        for (const c of clicks) {
+          const cdx = x - c.x, cdy = y - c.y;
+          const cd  = Math.sqrt(cdx * cdx + cdy * cdy);
+          const age = State.t - c.t;
+          const rr  = age * 540;
+          const band = Math.exp(-Math.pow((cd - rr) / 46, 2));
+          swell += band * Math.max(0, 1 - age / 2.0) * 1.5;
+        }
+
+        const r = r0 * (1 + swell * 3.0) * W;
+        if (r < 0.22) continue;
+        const a = clamp(0.12 + swell * 0.6, 0, 1);
+        const isAccent = swell > 0.62;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 6.2832);
+        ctx.fillStyle = isAccent ? P.accentA(a) : P.inkA(a * 0.5);
+        ctx.fill();
+      }
+    }
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
