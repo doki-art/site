@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Work — Nina Prisniak / dokiart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500&family=Archivo:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --white:  #ffffff;
+  --ink:    #0a0b0d;
+  --ink-2:  #383b3e;
+  --ink-3:  #6f7275;
+  --ink-4:  #9fa2a5;
+  --rule:   rgba(10,11,13,0.14);
+  --red:    #d7352d;
+
+  --sans:    'Inter Tight', -apple-system, system-ui, sans-serif;
+  --archivo: 'Archivo', sans-serif;
+  --mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  --pad: clamp(28px, 5vw, 71px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--red); color: var(--white); }
+
+main, header, footer { position: relative; z-index: 2; }
+
+/* ─── fixed left red bar ─── */
+.edge {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 100%;
+  background: var(--red);
+  z-index: 200;
+}
+
+/* ─── background column rules ─── */
+.bg-rules {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  display: grid;
+  grid-template-columns:
+    var(--pad)
+    0.4fr clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr
+    var(--pad);
+}
+.bg-rules .r { position: relative; border-left: 1px solid var(--rule); grid-row: 1; }
+.bg-rules .r0 { grid-column: 2; }
+.bg-rules .r1 { grid-column: 4; }
+.bg-rules .r2 { grid-column: 6; }
+.bg-rules .r3 { grid-column: 8; }
+
+/* ─── nav ─── */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px var(--pad);
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.logo .sq { width: 12px; height: 12px; background: var(--red); flex-shrink: 0; }
+.nav-links { display: flex; gap: 48px; }
+.nav-links a {
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: color .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-links a:hover { color: var(--red); }
+.nav-links a.active { color: var(--red); }
+.nav-links a.active::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ─── full-page pulse canvas ─── */
+#pulse-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ─── custom cursor ─── */
+@media (hover: hover) and (pointer: fine) {
+  * { cursor: none !important; }
+  #cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 7px; height: 7px;
+    margin: -3.5px 0 0 -3.5px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 1.5px solid var(--red);
+    pointer-events: none;
+    z-index: 300;
+    transition: width .22s ease, height .22s ease, margin .22s ease, background .22s ease, opacity .2s ease;
+  }
+  #cursor.is-hover {
+    width: 38px; height: 38px;
+    margin: -19px 0 0 -19px;
+    background: transparent;
+  }
+}
+
+/* ─── work head ─── */
+.work-head {
+  padding: 40px var(--pad) 8px;
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: inline-block;
+  margin-bottom: 26px;
+}
+.work-display {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(56px, 11vw, 168px);
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  margin-left: -0.04em;
+}
+.work-display .red { color: var(--red); }
+
+/* intro paragraph — snaps to the r1 content guide */
+.work-intro {
+  padding: 26px var(--pad) 56px;
+  display: grid;
+  grid-template-columns:
+    0.4fr clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr   clamp(30px,5vw,80px)
+    1fr;
+  align-items: start;
+}
+.work-intro .spacer { grid-column: 1 / 3; }
+.work-intro .body { grid-column: 5 / -1; }
+.work-intro .body p {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink);
+  max-width: 50ch;
+}
+
+/* ─── case index list ─── */
+.work { padding: 0 var(--pad) 40px; }
+.case-list {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--rule);
+}
+.case-row {
+  display: grid;
+  grid-template-columns: 60px 1.5fr 1fr auto;
+  gap: clamp(20px, 3vw, 56px);
+  align-items: center;
+  padding: 36px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.case-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+}
+
+.case-main { display: flex; flex-direction: column; gap: 8px; }
+.case-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(22px, 2.8vw, 38px);
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  color: var(--ink);
+  max-width: 24ch;
+}
+.case-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+
+.case-tags { display: flex; flex-wrap: wrap; gap: 8px; align-content: center; }
+.tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 1px solid var(--rule);
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+/* status marker (replaces lock/arrow while everything is in progress) */
+.status {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+.status .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  flex-shrink: 0;
+}
+.status.live { color: var(--red); }
+.status.live .dot { background: var(--red); animation: blink 2s infinite; }
+
+/* ─── footer ─── */
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px var(--pad);
+  border-top: 1px solid var(--rule);
+  font-family: var(--archivo);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+}
+.foot .clock { display: inline-flex; align-items: center; gap: 10px; }
+.foot .clock .pulse {
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: .4; transform: scale(.85); }
+  50%      { opacity: 1;  transform: scale(1.1); }
+}
+.foot .links a { color: var(--ink-3); margin-left: 18px; transition: color .2s; }
+.foot .links a:hover { color: var(--red); }
+
+/* ─── responsive ─── */
+@media (max-width: 880px) {
+  .bg-rules { display: none; }
+  .work-intro { grid-template-columns: 1fr; }
+  .work-intro .spacer { display: none; }
+
+  .case-row {
+    grid-template-columns: 1fr auto;
+    gap: 14px 20px;
+    align-items: start;
+  }
+  .case-num { grid-column: 1; grid-row: 1; }
+  .case-main { grid-column: 1; grid-row: 2; }
+  .case-tags { grid-column: 1; grid-row: 3; }
+  .status { grid-column: 2; grid-row: 1; }
+  .case-title { max-width: none; }
+
+  .foot { flex-direction: column; gap: 14px; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="pulse-canvas"></canvas>
+<div id="cursor"></div>
+<div class="edge"></div>
+<div class="bg-rules">
+  <div class="r r0"></div><div class="r r1"></div><div class="r r2"></div><div class="r r3"></div>
+</div>
+
+<header class="nav">
+  <a class="logo" href="index.html"><span class="sq"></span>dokiart</a>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="Work.html" class="active">Work</a>
+    <a href="About.html">About</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- head -->
+  <section class="work-head">
+    <span class="eyebrow">— Selected work</span>
+    <h1 class="work-display">Selected <span class="red">work.</span></h1>
+  </section>
+
+  <section class="work-intro">
+    <div class="spacer"></div>
+    <div class="body">
+      <p>Five cases across complex B2B SaaS — fintech, martech, healthcare, automotive, and a marketplace. The detailed studies are being rebuilt; the first public case is in progress and lands here soon.</p>
+    </div>
+  </section>
+
+  <!-- case index (all in progress) -->
+  <section class="work">
+    <div class="case-list" id="case-list">
+
+      <div class="case-row">
+        <span class="case-num">/ 01</span>
+        <div class="case-main">
+          <div class="case-title">Making risk legible for the people who carry it</div>
+        </div>
+        <div class="case-tags">
+          <span class="tag">Fintech</span>
+          <span class="tag">B2B SaaS</span>
+          <span class="tag">Self-initiated</span>
+        </div>
+        <span class="status live"><span class="dot"></span>In progress</span>
+      </div>
+
+      <div class="case-row">
+        <span class="case-num">/ 02</span>
+        <div class="case-main">
+          <div class="case-title">Making multi-step automation legible</div>
+          <div class="case-meta">Connection rate 30% → 42%</div>
+        </div>
+        <div class="case-tags">
+          <span class="tag">Martech</span>
+          <span class="tag">B2B SaaS</span>
+          <span class="tag">Design systems</span>
+        </div>
+        <span class="status"><span class="dot"></span>Coming soon</span>
+      </div>
+
+      <div class="case-row">
+        <span class="case-num">/ 03</span>
+        <div class="case-main">
+          <div class="case-title">From abstract idea to a product that shipped and found clients</div>
+        </div>
+        <div class="case-tags">
+          <span class="tag">Automotive</span>
+          <span class="tag">B2B SaaS</span>
+          <span class="tag">0 → 1</span>
+        </div>
+        <span class="status"><span class="dot"></span>Coming soon</span>
+      </div>
+
+      <div class="case-row">
+        <span class="case-num">/ 04</span>
+        <div class="case-main">
+          <div class="case-title">Turning scattered diagnostic data into one decision surface</div>
+        </div>
+        <div class="case-tags">
+          <span class="tag">Healthcare</span>
+          <span class="tag">B2B SaaS</span>
+          <span class="tag">NDA</span>
+        </div>
+        <span class="status"><span class="dot"></span>Coming soon</span>
+      </div>
+
+      <div class="case-row">
+        <span class="case-num">/ 05</span>
+        <div class="case-main">
+          <div class="case-title">Building a brand and a product from a rough idea</div>
+        </div>
+        <div class="case-tags">
+          <span class="tag">Marketplace</span>
+          <span class="tag">B2B + B2C</span>
+          <span class="tag">Brand</span>
+        </div>
+        <span class="status"><span class="dot"></span>Coming soon</span>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>© 2026 Nina Prisniak / dokiart</span>
+  <span class="clock">
+    <span class="pulse"></span>
+    Ukraine, Kyiv · EMEA remote — <span data-clock>—</span>
+  </span>
+  <span class="links">
+    <a href="https://www.linkedin.com/in/nina-prisniak" target="_blank">LinkedIn</a>
+    <a href="https://www.behance.net/dokiart" target="_blank">Behance</a>
+  </span>
+</footer>
+
+<script>
+// ── Kyiv clock ──
+function tick() {
+  const t = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Kyiv', hour: '2-digit', minute: '2-digit', hour12: false
+  }).format(new Date());
+  document.querySelectorAll('[data-clock]').forEach(el => el.textContent = t);
+}
+tick(); setInterval(tick, 15000);
+
+// ── shared click ripples ──
+window.__dokiClicks = [];
+window.addEventListener('pointerdown', e => {
+  if (e.target.closest('a, button, input, textarea, select')) return;
+  const now = performance.now();
+  window.__dokiClicks = window.__dokiClicks.filter(c => now - c.t < 2500);
+  window.__dokiClicks.push({ cx: e.clientX, cy: e.clientY, t: now });
+});
+
+// ── custom cursor ──
+(function () {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const cursor = document.getElementById('cursor');
+  let visible = false;
+  window.addEventListener('pointermove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    if (!visible) { cursor.style.opacity = '1'; visible = true; }
+    const interactive = e.target.closest('a, button, input, textarea, select');
+    cursor.classList.toggle('is-hover', !!interactive);
+  });
+  document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; visible = false; });
+  document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; visible = true; });
+})();
+
+// ── full-page pulse grid (static field: reacts to cursor + clicks only) ──
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const INK_RGB = [10, 11, 13];
+  const ACC_RGB = [215, 53, 45];
+  const inkA = a => `rgba(${INK_RGB},${a})`;
+  const accA = a => `rgba(${ACC_RGB},${a})`;
+  const canvas = document.getElementById('pulse-canvas');
+  const ctx = canvas.getContext('2d');
+  let w = 0, h = 0, dpr = 1;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize); resize();
+  const M = { x: w / 2, y: h / 2, sx: w / 2, sy: h / 2 };
+  window.addEventListener('pointermove', e => { M.x = e.clientX; M.y = e.clientY; });
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function frame(now) {
+    requestAnimationFrame(frame);
+    M.sx += (M.x - M.sx) * 0.05; M.sy += (M.y - M.sy) * 0.05;
+    const clicks = window.__dokiClicks;
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+    const gap = 32, r0 = 1.15, W = 0.55, mx = M.sx, my = M.sy;
+    const ox = ((w % gap) / 2) + gap / 2, oy = ((h % gap) / 2) + gap / 2;
+    for (let y = oy; y < h; y += gap) {
+      for (let x = ox; x < w; x += gap) {
+        const dx = x - mx, dy = y - my, d = Math.sqrt(dx * dx + dy * dy);
+        let swell = 0.30;
+        const suppress = Math.exp(-d * d / (180 * 180));
+        swell *= (1 - suppress * 0.92);
+        for (const c of clicks) {
+          const cdx = x - c.cx, cdy = y - c.cy, cd = Math.sqrt(cdx * cdx + cdy * cdy);
+          const age = (now - c.t) / 1000, rr = age * 540;
+          const band = Math.exp(-Math.pow((cd - rr) / 46, 2));
+          swell += band * Math.max(0, 1 - age / 2.0) * 1.5;
+        }
+        const r = r0 * (1 + swell * 3.0) * W;
+        if (r < 0.22) continue;
+        const a = clamp(0.12 + swell * 0.6, 0, 1);
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832);
+        ctx.fillStyle = swell > 0.62 ? accA(a) : inkA(a * 0.5); ctx.fill();
+      }
+    }
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
